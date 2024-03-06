@@ -7,6 +7,7 @@ import danogl.gui.ImageReader;
 import danogl.gui.SoundReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.WindowController;
+import danogl.gui.rendering.RectangleRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
@@ -18,56 +19,134 @@ import pepse.world.daynight.Night;
 import pepse.world.daynight.Sun;
 import pepse.world.daynight.SunHalo;
 import pepse.world.EnergyUI;
+import pepse.world.trees.Flora;
+
+import java.awt.*;
 import java.util.List;
 
+/**
+ * The game manager class for the Pepse game.
+ * Manages the initialization and setup of game elements.
+ * @author Daniel, inbar
+ */
 public class PepseGameManager extends GameManager {
-
-    private int skyLayer = 10;
     private int CYCLE_LENGTH = 30;
+    private Vector2 windowDimentions;
+    private Terrain terrain;
 
+    /**
+     * The entry point of the program. Creates an instance of PepseGameManager and runs the game.
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         new PepseGameManager().run();
     }
 
+    /**
+     * Initializes the game components including terrain, sky, sun, avatar, and energy UI.
+     * @param imageReader The ImageReader object for reading images.
+     * @param soundReader The SoundReader object for reading sounds.
+     * @param inputListener The UserInputListener object for handling user input.
+     * @param windowController The WindowController object for managing the game window.
+     */
     @Override
     public void initializeGame(ImageReader imageReader, SoundReader soundReader,
                                UserInputListener inputListener, WindowController windowController) {
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
+        this.windowDimentions = windowController.getWindowDimensions();
 
-//        // create sky
-        GameObject sky = Sky.create(windowController.getWindowDimensions());
-        Renderable skyImage = imageReader.readImage("assets/sky.jpg", true);
-        sky.renderer().setRenderable(skyImage);
-        gameObjects().addGameObject(sky, Layer.BACKGROUND); // made it background so it's drawn first
         // create terrain
-        Terrain terrain = new Terrain(windowController.getWindowDimensions(), 0);
-        List<Block> blocks = terrain.createInRange(0, (int) windowController.getWindowDimensions().x());
-        for (Block block : blocks) {
-            gameObjects().addGameObject(block, Layer.STATIC_OBJECTS);
-        }
+        makeTerrain(windowController);
+
+        // create sky
+        makeSky(imageReader);
+
         // create night
-        GameObject night = Night.create(windowController.getWindowDimensions(), CYCLE_LENGTH);
+        GameObject night = Night.create(windowDimentions, CYCLE_LENGTH);
         gameObjects().addGameObject(night, Layer.FOREGROUND);
 
-
         // create sun
-        GameObject sun = Sun.create(windowController.getWindowDimensions(), CYCLE_LENGTH*2);
-        //create sun halo
-        GameObject sunHalo = SunHalo.create(sun);
-        gameObjects().addGameObject(sunHalo, Layer.BACKGROUND);
-        gameObjects().addGameObject(sun, Layer.BACKGROUND);
+        makeSunAndHalo();
+
         // add avatar
-        Vector2 avatarPlacment = new Vector2(windowController.getWindowDimensions().x()/2
-                , windowController.getWindowDimensions().y()*2/3);
-        Avatar avatar = new Avatar(avatarPlacment,inputListener,imageReader);
-        gameObjects().addGameObject(avatar,Layer.DEFAULT);
+        Avatar avatar = makeAvatar(inputListener, imageReader);
+
         // create energy UI
+        makeEnergy(avatar);
+
+        // create flora
+        makeFlora(avatar);
+    }
+
+    private void makeFlora(Avatar avatar) {
+        Flora.GroundHeightProvider groundHeightProvider = x -> terrain.getGroundHeightAtX0(x);
+        Flora flora = new Flora(avatar, groundHeightProvider);
+
+        //TODO
+        // add the logs and leafs to the game objects array
+    }
+
+
+    /**
+     * Creates the energy UI and adds it to the game objects.
+     * @param avatar The Avatar object to bind energy UI to.
+     */
+    private void makeEnergy(Avatar avatar){
         Vector2 energyUIPosition = new Vector2(20, 20);
         Vector2 energyUISize = new Vector2(200, 30);
         Renderable energyUIRenderable = new TextRenderable("Energy: 100");
         EnergyUI energyUI = new EnergyUI(energyUIPosition, energyUISize, energyUIRenderable);
         avatar.setEnergyLevelCallback(energyUI::updateEnergy);
         gameObjects().addGameObject(energyUI, Layer.UI);
+    }
 
+    /**
+     * Creates an Avatar object and adds it to the game objects.
+     * @param inputListener The UserInputListener object for handling user input.
+     * @param imageReader The ImageReader object for reading images.
+     * @return The created Avatar object.
+     */
+    private Avatar makeAvatar(UserInputListener inputListener, ImageReader imageReader){
+        int index = (int)((windowDimentions.x()/2)/windowDimentions.x());
+        Vector2 avatarPlacment = new Vector2(windowDimentions.x()/2
+                , terrain.getGroundHeightAtX0(index));
+        System.out.println(terrain.getGroundHeightAtX0(index));
+        Avatar avatar = new Avatar(avatarPlacment,inputListener,imageReader);
+        gameObjects().addGameObject(avatar,Layer.DEFAULT);
+        return avatar;
+    }
+
+    /**
+     * Creates the Sun and its halo and adds them to the game objects.
+     */
+    private void makeSunAndHalo(){
+        GameObject sun = Sun.create(windowDimentions, CYCLE_LENGTH*2);
+        //create sun halo
+        GameObject sunHalo = SunHalo.create(sun);
+        gameObjects().addGameObject(sunHalo, Layer.BACKGROUND);
+        gameObjects().addGameObject(sun, Layer.BACKGROUND);
+    }
+
+    /**
+     * Creates the terrain and adds its blocks to the game objects.
+     * @param windowController The WindowController object for managing the game window.
+     */
+    private void makeTerrain(WindowController windowController){
+        terrain = new Terrain(windowDimentions, 0);
+        List<Block> blocks = terrain.createInRange(0, (int) windowController.getWindowDimensions().x());
+        for (Block block : blocks) {
+            gameObjects().addGameObject(block, Layer.STATIC_OBJECTS);
+        }
+    }
+
+    /**
+     * Creates the sky GameObject and adds it to the game objects.
+     * @param imageReader The ImageReader object for reading images.
+     */
+    private void makeSky(ImageReader imageReader){
+        GameObject sky = Sky.create(windowDimentions);
+        Renderable skyImage = imageReader.readImage("assets/sky.jpg", true);
+        sky.renderer().setRenderable(skyImage);
+        gameObjects().addGameObject(sky, Layer.BACKGROUND); // made it background so it's drawn first
     }
 }
