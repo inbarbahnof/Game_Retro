@@ -21,11 +21,10 @@ import static java.awt.image.ImageObserver.HEIGHT;
  * @author Daniel, inbar
  */
 public class Avatar extends GameObject {
-    private static final float VELOCITY_X = 400;
-    private static final float VELOCITY_Y = -650;
-    private static final float GRAVITY = 600;
+    private static final float VELOCITY_X = 300;
+    private static final float VELOCITY_Y = -350;
+    private static final float GRAVITY = 300;
     private static final float MAX_ENERGY = 100;
-    private static final Color AVATAR_COLOR = Color.DARK_GRAY;
     private static final float WIDTH = 50;
     private static final float HEIGHT = 78;
     private AnimationRenderable idleAnimation;
@@ -37,6 +36,7 @@ public class Avatar extends GameObject {
     private UserInputListener inputListener;
     private EnergyLevelCallback energyLevelCallback;
     private ArrayList<AvatarObserver> observers;
+    private static final String AVATAR= "Avatar";
 
     /**
      * Constructs an Avatar object with specified position, input listener, and image reader.
@@ -57,6 +57,7 @@ public class Avatar extends GameObject {
         currentAnimation = "idle";
         renderer().setRenderable(idleAnimation);
         observers = new ArrayList<>();
+        setTag(AVATAR);
     }
 
     /**

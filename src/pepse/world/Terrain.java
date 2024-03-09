@@ -30,8 +30,7 @@ public class Terrain {
      */
     public Terrain(Vector2 windowDimensions, int seed){
         groundHeightAtX0 = windowDimensions.x() * INIT_X_GROUND;
-        double seedDouble = seed;
-        noiseGenerator = new NoiseGenerator(seedDouble,(int)groundHeightAtX0);
+        noiseGenerator = new NoiseGenerator((double) seed,(int)groundHeightAtX0);
         windowHeigth = windowDimensions.y();
     }
 
@@ -41,7 +40,8 @@ public class Terrain {
      * @return the height
      */
     public float getGroundHeightAtX0(float x){
-        int index = (int) x;
+        int index = (int) x/BLOCK_SIZE;
+
         return blockHeights.get(index);
     }
 
@@ -63,11 +63,11 @@ public class Terrain {
          for (int x = minX; x <= maxX; x += BLOCK_SIZE) {
              float noise = (float) noiseGenerator.noise(x, BLOCK_SIZE * 7);
              float y = ((groundHeightAtX0 + noise) / BLOCK_SIZE) * BLOCK_SIZE;
-             blockHeights.add(((y + BLOCK_SIZE) - (2/3f) * windowHeigth));
+             blockHeights.add((y + BLOCK_SIZE)- (INIT_X_GROUND) * windowHeigth);
 
              int Depth = (int)(windowHeigth - (2*windowHeigth/(3*BLOCK_SIZE)));
              for (int i = 0; i < Depth; i++) {
-                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) - (2/3f) * windowHeigth));
+                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) - (INIT_X_GROUND) * windowHeigth));
                  RectangleRenderable rectangleRenderable = new RectangleRenderable
                          (ColorSupplier.approximateColor(BASE_GROUND_COLOR));
                  Block block = new Block(placement, rectangleRenderable);
@@ -77,4 +77,29 @@ public class Terrain {
          }
         return blocks;
     }
+
+//    public List<Block> createInRange(int minX, int maxX) {
+//        ArrayList<Block> blocks = new ArrayList<>();
+//        blockHeights = new ArrayList<>();
+//
+//        minX = (minX*BLOCK_SIZE)/BLOCK_SIZE;
+//        maxX = (int)Math.ceil(maxX*BLOCK_SIZE)/BLOCK_SIZE;
+//        for (int x = minX; x <maxX ; x+=BLOCK_SIZE) {
+//            float y =(float) noiseGenerator.noise(x*BLOCK_SIZE, BLOCK_SIZE * 7)%BLOCK_SIZE
+//                    + groundHeightAtX0;
+//            blockHeights.add(y);
+//            int Depth = (int)(windowHeigth*BLOCK_SIZE)/BLOCK_SIZE;
+//             for (int i = 0; i < Depth; i++) {
+//                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) - (INIT_X_GROUND) * windowHeigth));
+//                 RectangleRenderable rectangleRenderable = new RectangleRenderable
+//                         (ColorSupplier.approximateColor(BASE_GROUND_COLOR));
+//                 Block block = new Block(placement, rectangleRenderable);
+//                 block.setTag("ground");
+//                 blocks.add(block);
+//             }
+//
+//        }
+//
+//        return blocks;
+//    }
 }

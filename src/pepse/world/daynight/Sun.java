@@ -21,6 +21,8 @@ public class Sun {
      */
     public  final static float SUN_RADIUS = 25;
     private final static float TWO_THIRDS= 2/3f;
+    private static final float CIRCLE_START = 0f;
+    private static final float CIRCLE_END = 360f;
     private final static Vector2 SUN_SIZE = new Vector2(2*SUN_RADIUS, SUN_RADIUS*2);
 
     /**
@@ -39,7 +41,7 @@ public class Sun {
         Vector2 cycleCenter = new Vector2(windowDimensions.x()/2, windowDimensions.y()*TWO_THIRDS);
         Consumer<Float> sunChange = (Float angle)->
                 sun.setCenter(initialSunCenter.subtract(cycleCenter).rotated(angle).add(cycleCenter));
-      new Transition(sun, sunChange, 0f, 360f, Transition
+      new Transition(sun, sunChange, CIRCLE_START, CIRCLE_END, Transition
                 .LINEAR_INTERPOLATOR_FLOAT, cycleLength/2,
               Transition.TransitionType.TRANSITION_LOOP,null);
         return sun;

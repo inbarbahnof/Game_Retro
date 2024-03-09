@@ -1,16 +1,36 @@
 package pepse.world.trees;
 
 import danogl.GameObject;
+import danogl.components.ScheduledTask;
+import danogl.components.Transition;
+import danogl.gui.rendering.OvalRenderable;
 import danogl.gui.rendering.RectangleRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import pepse.util.ColorSupplier;
 
 import java.awt.*;
+import java.util.Random;
+import java.util.function.Consumer;
 
+import static java.awt.Color.PINK;
+
+/**
+ * Leaf class represents a leaf GameObject in the game world.
+ * It provides functionality to change the appearance and behavior of the leaf.
+ *
+ * @author Daniel, Inbar
+ */
 public class Leaf extends GameObject {
     private static final Color GREEN = new Color(50, 200, 30);
-    private Renderable renderable;
+    private static final float WIDTH_DURATION = 5f;
+    private static final float CIRCLE_START = 0f;
+    private static final float CIRCLE_END = 360f;
+    private static final float ANGLE_DURATION = 20f;
+    private static final float LEAF_MAX_WIDTH = 15f;
+    private static final float LEAF_MIN_WIDTH = 10f;
+    private static final float LEAF_ROTATION_ANGLE = 90f;
+
     /**
      * Construct a new GameObject instance.
      *
@@ -22,9 +42,42 @@ public class Leaf extends GameObject {
      */
     public Leaf(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable) {
         super(topLeftCorner, dimensions, renderable);
+        Random random = new Random();
+        Consumer<Float> angelConsumer = (Float angle) -> renderer().setRenderableAngle(angle);
+        Consumer<Float> dimentionsConsumer = (Float width) ->
+                setDimensions(new Vector2(width, dimensions.y()));
+        Leaf leafInstance = this;
+        float leafDegree = this.renderer().getRenderableAngle();
+        Runnable angleTask = new Runnable() {
+            @Override()
+            public void run() {
+                // Code to execute when the task runs
+                new Transition(leafInstance, angelConsumer, leafDegree, leafDegree+CIRCLE_END,
+                        Transition.LINEAR_INTERPOLATOR_FLOAT, ANGLE_DURATION,
+                        Transition.TransitionType.TRANSITION_BACK_AND_FORTH, null);
+            }
+        };
+
+        Runnable dimentionTask = new Runnable() {
+            @Override
+            public void run() {
+                // Code to execute when the task runs
+                new Transition(leafInstance, dimentionsConsumer,
+                        LEAF_MAX_WIDTH, LEAF_MIN_WIDTH,
+                        Transition.LINEAR_INTERPOLATOR_FLOAT, WIDTH_DURATION,
+                        Transition.TransitionType.TRANSITION_BACK_AND_FORTH, null);
+            }
+        };
+        new ScheduledTask(this, random.nextFloat(), false, angleTask);
+        new ScheduledTask(this, random.nextFloat(), false, dimentionTask);
     }
 
+    /**
+     * Changes the color and rotation angle of the leaf.
+     */
     public void changeColor(){
-        renderable = new RectangleRenderable(ColorSupplier.approximateColor(GREEN));
+        renderer().setRenderableAngle(LEAF_ROTATION_ANGLE);
+        Renderable renderable =  new RectangleRenderable(ColorSupplier.approximateColor(GREEN));
+        this.renderer().setRenderable(renderable);
     }
 }

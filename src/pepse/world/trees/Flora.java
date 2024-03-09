@@ -17,36 +17,72 @@ import java.util.Random;
  * @author Daniel, inbar
  */
 public class Flora {
-    private static final Color GREEN = new Color(50, 200, 30);
     private static final Color BROWN = new Color(100, 50, 20);
-    private static final float BUSH_SIZE = 80;
-    private static final float LEAF_SIZE = 15;
-    private static final float MIN_TREE_HEIGHT = 30;
-    private static final float MAX_TREE_HEIGHT = 50;
+    private static final float BIOS_COIN_PROB = 0.1f;
+    private static final int LEAF_BOUND = 50;
+    private static final int FRUIT_BOUND = 5;
+    private static final float MIN_TREE_HEIGHT = 100;
+    private static final float MAX_TREE_HEIGHT = 250;
     private static final float BLOCK_SIZE = 30;
     private Avatar avatar;
     private GroundHeightProvider groundHeightProvider; // Functional interface
-    private HashMap<GameObject, ArrayList<GameObject>> trees;
+    private HashMap<GameObject, ArrayList<Fruit>> fruits;
     private Random random;
 
+    /**
+     * Constructs a Flora object with an Avatar and a GroundHeightProvider.
+     *
+     * @param avatar the Avatar object in the game world
+     * @param groundHeightProvider the provider of ground height
+     */
     public Flora(Avatar avatar, GroundHeightProvider groundHeightProvider){
         this.avatar = avatar;
         this.groundHeightProvider = groundHeightProvider;
         this.random = new Random();
+        fruits = new HashMap<>();
     }
 
     /**
-     * makes the trees at certain locations
+     * Generates trees with leaves and fruits within a specified range.
+     *
+     * @param minX the minimum X coordinate for tree generation
+     * @param maxX the maximum X coordinate for tree generation
+     * @return a HashMap containing TreeLog and corresponding ArrayList of leaves
      */
-    public HashMap<GameObject, ArrayList<GameObject>> createInRange(int minX, int maxX) {
-        HashMap<GameObject, ArrayList<GameObject>> treesMap = new HashMap<>();
+    public HashMap<TreeLog, ArrayList<Leaf>> createInRange(int minX, int maxX) {
+        HashMap<TreeLog, ArrayList<Leaf>> treesMap = new HashMap<>();
+        Random rand = new Random();
 
-        //TODO
-        // calculate the tree position, call to create tree
-        // for each tree, make the leafs
-        // add the tree log->leafs to treesmap
+        for (int x = minX; x <= maxX; x += (int)BLOCK_SIZE) {
+            if (rand.nextFloat() <= BIOS_COIN_PROB){
+                float groundHeight = groundHeightProvider.getGroundHeightAtX0(x/BLOCK_SIZE);
+                Vector2 position = new Vector2(x, groundHeight);
+                TreeLog log = createTreeLog(position);
+                int leafNum = rand.nextInt(LEAF_BOUND) + 5;
+                int fruitNum = rand.nextInt(FRUIT_BOUND) + 1;
 
+                TreeLeafs leafs = new TreeLeafs(position, leafNum, log.getDimensions().y());
+                avatar.addObserver(leafs);
+                ArrayList<Leaf> treeLeaf = leafs.getLeafs();
+
+                TreeFruits fruit = new TreeFruits(position, fruitNum, log.getDimensions().y());
+                ArrayList<Fruit> treeFruits = fruit.getTreeFruits();
+                avatar.addObserver(fruit);
+
+                fruits.put(log, treeFruits);
+                treesMap.put(log, treeLeaf);
+            }
+        }
         return treesMap;
+    }
+
+    /**
+     * Retrieves the generated fruits.
+     *
+     * @return a HashMap containing GameObject and corresponding ArrayList of fruits
+     */
+    public HashMap<GameObject, ArrayList<Fruit>> getFruits(){
+        return fruits;
     }
 
     /**
@@ -63,6 +99,9 @@ public class Flora {
         return log;
     }
 
+    /**
+     * Functional interface for providing ground height at a specific X coordinate.
+     */
     @FunctionalInterface
     public interface GroundHeightProvider {
         float getGroundHeightAtX0(float x);

@@ -19,9 +19,11 @@ import pepse.world.daynight.Night;
 import pepse.world.daynight.Sun;
 import pepse.world.daynight.SunHalo;
 import pepse.world.EnergyUI;
-import pepse.world.trees.Flora;
+import pepse.world.trees.*;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,6 +32,7 @@ import java.util.List;
  * @author Daniel, inbar
  */
 public class PepseGameManager extends GameManager {
+
     private int CYCLE_LENGTH = 30;
     private Vector2 windowDimentions;
     private Terrain terrain;
@@ -54,16 +57,11 @@ public class PepseGameManager extends GameManager {
                                UserInputListener inputListener, WindowController windowController) {
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
         this.windowDimentions = windowController.getWindowDimensions();
-
         // create terrain
         makeTerrain(windowController);
 
         // create sky
         makeSky(imageReader);
-
-        // create night
-        GameObject night = Night.create(windowDimentions, CYCLE_LENGTH);
-        gameObjects().addGameObject(night, Layer.FOREGROUND);
 
         // create sun
         makeSunAndHalo();
@@ -76,14 +74,41 @@ public class PepseGameManager extends GameManager {
 
         // create flora
         makeFlora(avatar);
+
+        // create night
+        GameObject night = Night.create(windowDimentions, CYCLE_LENGTH);
+        gameObjects().addGameObject(night, Layer.FOREGROUND);
+
     }
 
+    /**
+     * makes the flora class
+     * @param avatar the avatar of the game
+     */
     private void makeFlora(Avatar avatar) {
         Flora.GroundHeightProvider groundHeightProvider = x -> terrain.getGroundHeightAtX0(x);
         Flora flora = new Flora(avatar, groundHeightProvider);
+        System.out.println(windowDimentions.x());
+        HashMap<TreeLog, ArrayList<Leaf>> trees = flora.createInRange(0,(int) windowDimentions.x());
 
-        //TODO
-        // add the logs and leafs to the game objects array
+        for (HashMap.Entry<TreeLog, ArrayList<Leaf>> entry : trees.entrySet()){
+            TreeLog treeLog = entry.getKey();
+            ArrayList<Leaf> leaves = entry.getValue();
+
+            gameObjects().addGameObject(treeLog, Layer.STATIC_OBJECTS);
+            avatar.addObserver(treeLog);
+
+            for (Leaf leaf : leaves){
+                gameObjects().addGameObject(leaf, Layer.BACKGROUND);
+            }
+        }
+        HashMap<GameObject, ArrayList<Fruit>> fruits = flora.getFruits();
+        for (HashMap.Entry<GameObject, ArrayList<Fruit>> entry : fruits.entrySet()){
+            ArrayList<Fruit> treeFruits = entry.getValue();
+            for (Fruit fruit : treeFruits){
+                gameObjects().addGameObject(fruit, Layer.DEFAULT);
+            }
+        }
     }
 
 
@@ -110,7 +135,6 @@ public class PepseGameManager extends GameManager {
         int index = (int)((windowDimentions.x()/2)/windowDimentions.x());
         Vector2 avatarPlacment = new Vector2(windowDimentions.x()/2
                 , terrain.getGroundHeightAtX0(index));
-        System.out.println(terrain.getGroundHeightAtX0(index));
         Avatar avatar = new Avatar(avatarPlacment,inputListener,imageReader);
         gameObjects().addGameObject(avatar,Layer.DEFAULT);
         return avatar;
@@ -134,9 +158,11 @@ public class PepseGameManager extends GameManager {
     private void makeTerrain(WindowController windowController){
         terrain = new Terrain(windowDimentions, 0);
         List<Block> blocks = terrain.createInRange(0, (int) windowController.getWindowDimensions().x());
+
         for (Block block : blocks) {
             gameObjects().addGameObject(block, Layer.STATIC_OBJECTS);
         }
+
     }
 
     /**

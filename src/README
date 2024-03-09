@@ -1,0 +1,33 @@
+niso,inbarbahnof
+207447970,207009721
+
+1)
+Classes:
+Tree package consist of:
+TreeLog- makes a log of a tree it can chenge appearnce with jump of the avatar
+so it implements avatarObserver to get notified of jumps.
+
+Leaf - represent a leaf object in the game. Each leaf has animation of two transitions one for size one
+for the angle.The color of leaf changes with reaction to the avatar jump.
+
+TreeLeafs - handles the making of the leafs of a certain treeLog implements avatarObserver so it
+can notify the leafs of avatar jump occurrences.
+
+fruit - same as the leaf class it represents one fruit  but also handles the OnCollision
+Method of the fruit with avatar and  to boost energy together with handling it's own disappearances.
+
+TreeFruit - handles the making of fruits of a certain treeLog implements avatarObserver
+because the fruits change color when avatar jumps.
+
+Flora - this class is the 'orchestrates' the package it bounds the treeLog the fruits and leafs
+and  is in charge of the creating of them alongside each other in relation to their position.
+
+2)
+Flora has use of TreeLog,TreeLeaf,TreeFruit and all other classes in the package as it creates the treeLogs
+with the  subcomponents.
+Leaf,TreeLeaf connection, TreeLeaf has an ArrayList of leaves.
+Fruit,TreeFruits connection , same as above.
+
+3)
+Observer pattern - the AvatarObserver interface and its implementations showcase the Observer pattern.
+Avatar has an  observer's arrayList so it can notify them when it jumps.
