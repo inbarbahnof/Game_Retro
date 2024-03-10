@@ -20,7 +20,7 @@ public class Flora {
     private static final Color BROWN = new Color(100, 50, 20);
     private static final float BIOS_COIN_PROB = 0.1f;
     private static final int LEAF_BOUND = 50;
-    private static final int FRUIT_BOUND = 5;
+    private static final int FRUIT_BOUND = 15;
     private static final float MIN_TREE_HEIGHT = 100;
     private static final float MAX_TREE_HEIGHT = 250;
     private static final float BLOCK_SIZE = 30;
@@ -104,6 +104,11 @@ public class Flora {
      */
     @FunctionalInterface
     public interface GroundHeightProvider {
+        /**
+         * returns the Ground Height at a certain x
+         * @param x the x coordinate
+         * @return the height
+         */
         float getGroundHeightAtX0(float x);
     }
 }

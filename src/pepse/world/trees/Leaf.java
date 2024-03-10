@@ -22,13 +22,11 @@ import static java.awt.Color.PINK;
  * @author Daniel, Inbar
  */
 public class Leaf extends GameObject {
-    private static final Color GREEN = new Color(50, 200, 30);
     private static final float WIDTH_DURATION = 5f;
-    private static final float CIRCLE_START = 0f;
-    private static final float CIRCLE_END = 360f;
+    private static final float CIRCLE_END = 25f;
     private static final float ANGLE_DURATION = 20f;
     private static final float LEAF_MAX_WIDTH = 15f;
-    private static final float LEAF_MIN_WIDTH = 10f;
+    private static final float LEAF_MIN_WIDTH = 12f;
     private static final float LEAF_ROTATION_ANGLE = 90f;
 
     /**
@@ -76,8 +74,12 @@ public class Leaf extends GameObject {
      * Changes the color and rotation angle of the leaf.
      */
     public void changeColor(){
-        renderer().setRenderableAngle(LEAF_ROTATION_ANGLE);
-        Renderable renderable =  new RectangleRenderable(ColorSupplier.approximateColor(GREEN));
-        this.renderer().setRenderable(renderable);
+        Consumer<Float> angelConsumer = (Float angle) ->
+                renderer().setRenderableAngle(angle);
+
+        float leafDegree = this.renderer().getRenderableAngle();
+        new Transition(this, angelConsumer, leafDegree, leafDegree+LEAF_ROTATION_ANGLE,
+                Transition.LINEAR_INTERPOLATOR_FLOAT, 1f,
+                Transition.TransitionType.TRANSITION_ONCE, null);
     }
 }

@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class TreeLeafs implements AvatarObserver {
     private static final Color GREEN = new Color(50, 200, 30);
-    private static final float BUSH_SIZE = 100;
+    private static final float BUSH_SIZE = 150;
     private static final float LEAF_SIZE = 15;
     private ArrayList<Leaf> leafs;
 

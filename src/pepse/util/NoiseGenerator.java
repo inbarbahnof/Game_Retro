@@ -2,6 +2,10 @@ package pepse.util;
 
 import java.util.Random;
 
+/**
+ * NoiseGenerator
+ * @author Dan Nirel
+ */
 public class NoiseGenerator {
     private double seed;
     private long default_size;
@@ -27,6 +31,9 @@ public class NoiseGenerator {
         init();
     }
 
+    /**
+     * Initializes the NoiseGenerator by populating the permutation array.
+     */
     private void init() {
         // Initialize the permutation array.
         this.p = new int[512];
@@ -85,7 +92,14 @@ public class NoiseGenerator {
         return value * factor / startPoint;
     }
 
-
+    /**
+     * Calculates the smooth noise at the specified coordinates.
+            *
+            * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @return the smooth noise value at the specified coordinates
+     */
     private double smoothNoise(double x, double y, double z) {
         // Offset each coordinate by the seed value
         x += this.seed;
@@ -121,14 +135,37 @@ public class NoiseGenerator {
                                 grad(p[BB + 1], x - 1, y - 1, z - 1))));
     }
 
+    /**
+     * Calculates the fade value for Perlin noise interpolation.
+     *
+     * @param t the input value
+     * @return the fade value
+     */
     private double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
+    /**
+     * Performs linear interpolation between two values.
+     *
+     * @param t the interpolation parameter
+     * @param a the start value
+     * @param b the end value
+     * @return the interpolated value
+     */
     private double lerp(double t, double a, double b) {
         return a + t * (b - a);
     }
 
+    /**
+     * Computes the gradient of the specified hash code.
+     *
+     * @param hash the hash code
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @return the gradient value
+     */
     private double grad(int hash, double x, double y, double z) {
         int h = hash & 15; // CONVERT LO 4 BITS OF HASH CODE
         double u = h < 8 ? x : y, // INTO 12 GRADIENT DIRECTIONS.

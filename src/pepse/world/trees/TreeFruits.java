@@ -21,7 +21,7 @@ import static java.awt.Color.RED;
  */
 public class TreeFruits implements AvatarObserver {
     private static final float FRUIT_SIZE = 15f;
-    private static final float BUSH_SIZE = 100;
+    private static final float BUSH_SIZE = 150;
     private final ArrayList<Fruit> fruits;
 
     /**

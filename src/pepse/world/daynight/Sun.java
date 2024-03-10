@@ -33,7 +33,7 @@ public class Sun {
      */
     public static GameObject create(Vector2 windowDimensions, float cycleLength) {
         Renderable skyRenderable = new OvalRenderable(Color.YELLOW);
-        Vector2 initialSunCenter = new Vector2(windowDimensions.x()/2 - SUN_RADIUS,
+        Vector2 initialSunCenter = new Vector2(windowDimensions.x()/3 - SUN_RADIUS,
                 windowDimensions.y()/2 - SUN_RADIUS);
         GameObject sun = new GameObject(initialSunCenter, SUN_SIZE, skyRenderable);
         sun.setTag("sun");

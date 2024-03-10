@@ -99,7 +99,7 @@ public class PepseGameManager extends GameManager {
             avatar.addObserver(treeLog);
 
             for (Leaf leaf : leaves){
-                gameObjects().addGameObject(leaf, Layer.BACKGROUND);
+                gameObjects().addGameObject(leaf, Layer.STATIC_OBJECTS + 1);
             }
         }
         HashMap<GameObject, ArrayList<Fruit>> fruits = flora.getFruits();

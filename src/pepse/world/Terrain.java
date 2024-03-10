@@ -67,7 +67,8 @@ public class Terrain {
 
              int Depth = (int)(windowHeigth - (2*windowHeigth/(3*BLOCK_SIZE)));
              for (int i = 0; i < Depth; i++) {
-                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) - (INIT_X_GROUND) * windowHeigth));
+                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) -
+                         (INIT_X_GROUND) * windowHeigth));
                  RectangleRenderable rectangleRenderable = new RectangleRenderable
                          (ColorSupplier.approximateColor(BASE_GROUND_COLOR));
                  Block block = new Block(placement, rectangleRenderable);
@@ -90,7 +91,8 @@ public class Terrain {
 //            blockHeights.add(y);
 //            int Depth = (int)(windowHeigth*BLOCK_SIZE)/BLOCK_SIZE;
 //             for (int i = 0; i < Depth; i++) {
-//                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) - (INIT_X_GROUND) * windowHeigth));
+//                 Vector2 placement = new Vector2(x, ((y + (i * BLOCK_SIZE)) -
+//                 (INIT_X_GROUND) * windowHeigth));
 //                 RectangleRenderable rectangleRenderable = new RectangleRenderable
 //                         (ColorSupplier.approximateColor(BASE_GROUND_COLOR));
 //                 Block block = new Block(placement, rectangleRenderable);
